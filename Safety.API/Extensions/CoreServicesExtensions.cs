@@ -1,5 +1,5 @@
 ﻿
-namespace GFOOT.API.Extensions
+namespace Safety.API.Extensions
 {
     public static class CoreServicesExtensions
     {

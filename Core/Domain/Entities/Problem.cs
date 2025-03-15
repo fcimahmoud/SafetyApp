@@ -6,6 +6,7 @@ namespace Domain.Entities
         public required string PictureUrl { get; set; }
         public required string Description { get; set; }
         public ProblemStatus Status { get; set; } = ProblemStatus.Pending;
+        public ProblemType Type { get; set; }
 
         public string? ClientId { get; set; }
         public Client? Client { get; set; }
@@ -18,5 +19,10 @@ namespace Domain.Entities
         Pending, // معلقة
         InProgress, // قيد التنفيذ
         Completed // مكتملة
+    }
+    public enum ProblemType
+    {
+        FireFightingSystems, // أنظمة مكافحة الحريق
+        EnvironmentalServices, // خدمات بيئية
     }
 }

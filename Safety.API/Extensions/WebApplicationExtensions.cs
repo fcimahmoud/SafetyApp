@@ -1,4 +1,6 @@
 ﻿
+global using Safety.API.Middlewares;
+
 namespace Safety.API.Extensions
 {
     public static class WebApplicationExtensions
@@ -12,7 +14,7 @@ namespace Safety.API.Extensions
             var services = scope.ServiceProvider;
 
             // CLR Create object from gFootContext
-            var gFootContextInitializer = services.GetRequiredService<IDbInitializer>();
+            var safetyContextInitializer = services.GetRequiredService<IDbInitializer>();
 
             // To Log Exceptions
             var loggerFactory = services.GetRequiredService<ILoggerFactory>();
@@ -20,7 +22,7 @@ namespace Safety.API.Extensions
             try
             {
                 // To Update Database for gFootContext
-                await gFootContextInitializer.InitializeIdentityAsync();
+                await safetyContextInitializer.InitializeIdentityAsync();
 
                 // To Seed Data for gFootContext
                 // await gFootContextInitializer.SeedAsync();            
@@ -32,6 +34,11 @@ namespace Safety.API.Extensions
                 logger.LogError(ex, "An error has been occured during applying the migration");
             }
 
+            return app;
+        }
+        public static WebApplication UseCustomExceptionMiddleware(this WebApplication app)
+        {
+            app.UseMiddleware<GlobalErrorHandlingMiddleware>();
             return app;
         }
     }

@@ -10,7 +10,11 @@ namespace Safety.API
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllers()
-                            .AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly);
+                .AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly)
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = null; // Ensure proper casing
+                }); ;
 
             builder.Services.AddCoreServices(builder.Configuration);
             builder.Services.AddInfraStructureServices(builder.Configuration);
@@ -20,8 +24,8 @@ namespace Safety.API
             
             var app = builder.Build();
 
+            app.UseCustomExceptionMiddleware();
             await app.SeedDbAsync();
-
 
             if (app.Environment.IsDevelopment())
             {

@@ -1,6 +1,7 @@
 ﻿
 global using Domain.Contracts;
 global using Persistence.Data;
+using System.Linq.Expressions;
 
 namespace Persistence.Repositories
 {
@@ -23,5 +24,12 @@ namespace Persistence.Repositories
         public async Task<TEntity?> GetAsync(TKey id)
             => await context.Set<TEntity>().FindAsync(id);
 
+        // Retrieve a single entity by condition
+        public async Task<TEntity?> GetByConditionAsync(Expression<Func<TEntity, bool>> condition)
+            => await context.Set<TEntity>().FirstOrDefaultAsync(condition);
+
+        // Retrieve all matching entities with optional tracking
+        public async Task<IEnumerable<TEntity>> GetAllByConditionAsync(Expression<Func<TEntity, bool>> condition)
+            => await context.Set<TEntity>().Where(condition).ToListAsync();
     }
 }

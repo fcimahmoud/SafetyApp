@@ -6,15 +6,21 @@ namespace Services
         IOptions<JwtOptions> options,
         IUnitOfWork unitOfWork,
         IOptions<EmailSettings> emailSettings,
-        IEmailService emailService
+        IEmailService emailService,
+        IFileService fileService,
+        IHttpContextAccessor httpContextAccessor
         ) : IServiceManager
     {
         private readonly Lazy<IAuthenticationService> _lazyAuthenticationService =
             new(() => new AuthenticationService(userManager, unitOfWork, options, emailService));
         private readonly Lazy<IEmailService> _lazyEmailService =
             new(() => new EmailService(emailSettings));
+        private readonly Lazy<IProblemService> _lazyProblemService =
+            new(() => new ProblemService(unitOfWork, fileService, httpContextAccessor));
 
         public IAuthenticationService AuthenticationService => _lazyAuthenticationService.Value;
         public IEmailService EmailService => _lazyEmailService.Value;
+
+        public IProblemService ProblemService => _lazyProblemService.Value;
     }
 }

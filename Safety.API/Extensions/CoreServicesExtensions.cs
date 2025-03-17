@@ -1,7 +1,7 @@
 ﻿
-using Services;
-using Services.Abstractions;
-using Shared.AuthenticationModels;
+global using Services;
+global using Services.Abstractions;
+global using Shared.AuthenticationModels;
 
 namespace Safety.API.Extensions
 {
@@ -11,6 +11,9 @@ namespace Safety.API.Extensions
         {
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.AddScoped<IEmailService, EmailService>();
+
+            services.AddSingleton<IFileService, FileService>();
+            services.AddHttpContextAccessor();
 
             services.AddScoped<IServiceManager, ServiceManager>();
 

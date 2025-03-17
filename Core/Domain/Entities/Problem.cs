@@ -3,7 +3,7 @@ namespace Domain.Entities
 {
     public class Problem : BaseEntity<string>
     {
-        public required string PictureUrl { get; set; }
+        public required string ImagePath { get; set; }
         public required string Description { get; set; }
         public ProblemStatus Status { get; set; } = ProblemStatus.Pending;
         public ProblemType Type { get; set; }

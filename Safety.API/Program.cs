@@ -1,5 +1,7 @@
 
 global using Safety.API.Extensions;
+using Services.Abstractions;
+using Services;
 
 namespace Safety.API
 {
@@ -9,15 +11,9 @@ namespace Safety.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllers()
-                .AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly)
-                .AddJsonOptions(options =>
-                {
-                    options.JsonSerializerOptions.PropertyNamingPolicy = null; // Ensure proper casing
-                }); ;
-
             builder.Services.AddCoreServices(builder.Configuration);
             builder.Services.AddInfraStructureServices(builder.Configuration);
+            builder.Services.AddPresentationServices();
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -33,6 +29,7 @@ namespace Safety.API
                 app.UseSwaggerUI();
             }
 
+            app.UseStaticFiles();
             app.UseHttpsRedirection();
 
             app.UseAuthentication();

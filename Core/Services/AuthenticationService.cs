@@ -3,7 +3,7 @@ namespace Services
 {
     public class AuthenticationService(
         UserManager<ApplicationUser> userManager,
-        IUnitOfWork _unitOfWork,
+        IUnitOfWork unitOfWork,
         IOptions<JwtOptions> options,
         IEmailService emailService
         )
@@ -61,9 +61,9 @@ namespace Services
                 throw new ValidationException(errors);
             }
 
-            var individualRepo = _unitOfWork.GetRepository<Client, string>();
+            var individualRepo = unitOfWork.GetRepository<Client, string>();
             await individualRepo.AddAsync(new Client { Id = Guid.NewGuid().ToString(), ApplicationUserId = user.Id });
-            await _unitOfWork.SaveChangesAsync();
+            await unitOfWork.SaveChangesAsync();
 
             // Generate refresh token and store it in the database
             user.RefreshToken = GenerateRefreshToken();

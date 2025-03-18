@@ -21,5 +21,14 @@ namespace Services
 
             return Path.Combine(folderName, fileName).Replace("\\", "/"); // Return relative path
         }
+
+        public void DeleteFile(string filePath)
+        {
+            var fullPath = Path.Combine(_env.WebRootPath, filePath);
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+            }
+        }
     }
 }

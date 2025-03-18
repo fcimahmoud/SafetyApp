@@ -1,7 +1,5 @@
 
 global using Safety.API.Extensions;
-using Services.Abstractions;
-using Services;
 
 namespace Safety.API
 {

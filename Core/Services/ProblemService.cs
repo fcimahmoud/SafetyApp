@@ -157,6 +157,12 @@ namespace Services
             if (problem == null)
                 throw new Exception("Problem not found");
 
+            // Delete associated image if exists
+            if (!string.IsNullOrEmpty(problem.ImagePath))
+            {
+                _fileService.DeleteFile(problem.ImagePath);
+            }
+
             problemRepo.Delete(problem);
             await _unitOfWork.SaveChangesAsync();
         }
@@ -195,6 +201,12 @@ namespace Services
 
             if (problem == null)
                 throw new Exception("Problem not found");
+
+            // Delete old image if exists
+            if (!string.IsNullOrEmpty(problem.ImagePath))
+            {
+                _fileService.DeleteFile(problem.ImagePath);
+            }
 
             string imagePath = await _fileService.SaveFileAsync(image, "uploads/problems");
             problem.ImagePath = imagePath;

@@ -17,10 +17,14 @@ namespace Services
             new(() => new EmailService(emailSettings));
         private readonly Lazy<IProblemService> _lazyProblemService =
             new(() => new ProblemService(unitOfWork, fileService, httpContextAccessor));
+        private readonly Lazy<IUserService> _lazyUserService =
+            new(() => new UserService(userManager, unitOfWork));
 
         public IAuthenticationService AuthenticationService => _lazyAuthenticationService.Value;
         public IEmailService EmailService => _lazyEmailService.Value;
 
         public IProblemService ProblemService => _lazyProblemService.Value;
+
+        public IUserService UserService => _lazyUserService.Value;
     }
 }

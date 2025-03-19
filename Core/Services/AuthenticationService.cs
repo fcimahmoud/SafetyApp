@@ -73,7 +73,7 @@ namespace Services
             // Generate email confirmation token
             var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
             var encodedToken = WebUtility.UrlEncode(token); // Ensure URL safe token
-            var confirmationLink = $"https://yourfrontend.com/confirm-email?email={user.Email}&token={encodedToken}";
+            var confirmationLink = $"https://safety.com/verify-email?email={user.Email}&token={encodedToken}";
 
             var emailBody = $@"
             <h2>Confirm Your Email</h2>
@@ -166,7 +166,7 @@ namespace Services
             if (user == null) return false;  // Email doesn't exist
 
             var token = await userManager.GeneratePasswordResetTokenAsync(user);
-            var resetUrl = $"https://localhost:5001/api/Authentication/Reset-Password?email={dto.Email}&token={token}";
+            var resetUrl = $"https://safety.com/reset-password?email={dto.Email}&token={token}";
             // var resetUrl = $"{_config["AppSettings:FrontendUrl"]}/Reset-Password?email={email}&token={token}";
 
 

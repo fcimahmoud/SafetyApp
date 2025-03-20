@@ -14,5 +14,8 @@ namespace Domain.Contracts
 
         public Task<TEntity?> GetByConditionAsync(Expression<Func<TEntity, bool>> condition);
         public Task<IEnumerable<TEntity>> GetAllByConditionAsync(Expression<Func<TEntity, bool>> condition);
+
+        public Task<TEntity?> GetWithIncludesAsync(Expression<Func<TEntity, bool>> condition, params Expression<Func<TEntity, object>>[] includes);
+        public Task<IEnumerable<TEntity>> GetAllWithIncludesAsync(Expression<Func<TEntity, bool>> condition, params Expression<Func<TEntity, object>>[] includes);
     }
 }

@@ -10,7 +10,9 @@ namespace Shared.ProblemModels
         public string Description { get; set; } = string.Empty;
         public ProblemStatus Status { get; set; }
         public string? ClientId { get; set; }
+        public string? ClientName { get; set; }
         public string? TechnicianId { get; set; }
+        public string? TechnicianName { get; set; }
         public ProblemType Type { get; set; }
     }
 }

@@ -7,9 +7,27 @@ namespace Presentation
     public class AuthenticationController (IServiceManager serviceManager)
         : ApiController
     {
-        [HttpGet("Login")]
+        [HttpPost("Login")]
         public async Task<ActionResult<UserResultDTO>> Login(LoginDTO login)
             => Ok(await serviceManager.AuthenticationService.LoginAsync(login));
+
+        [HttpPost("Logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("Invalid user token");
+
+            var result = await serviceManager.AuthenticationService.LogoutAsync(userId);
+
+            if (!result)
+                return BadRequest("Logout failed");
+
+            return Ok(new { message = "Logout successful" });
+        }
+
 
         [HttpPost("Register")]
         public async Task<ActionResult<UserResultDTO>> Register(RegisterDTO register)

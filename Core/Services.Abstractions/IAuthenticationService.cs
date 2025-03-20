@@ -6,6 +6,7 @@ namespace Services.Abstractions
     public interface IAuthenticationService
     {
         public Task<UserResultDTO> LoginAsync(LoginDTO loginModel);
+        public Task<bool> LogoutAsync(string userId);
         public Task<UserResultDTO> RegisterAsync(RegisterDTO registerModel);
         public Task<bool> ConfirmEmailAsync(string email, string token);
         public Task<UserResultDTO> RefreshTokenAsync(string refreshToken);

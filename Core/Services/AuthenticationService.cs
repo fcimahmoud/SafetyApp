@@ -5,7 +5,8 @@ namespace Services
         UserManager<ApplicationUser> userManager,
         IUnitOfWork unitOfWork,
         IOptions<JwtOptions> options,
-        IEmailService emailService
+        IEmailService emailService,
+        IHttpContextAccessor httpContextAccessor
         )
         : IAuthenticationService
     {
@@ -33,6 +34,19 @@ namespace Services
               user.RefreshToken!);
 
         }
+        public async Task<bool> LogoutAsync(string userId)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null) return false;
+
+            // Invalidate Refresh Token
+            user.RefreshToken = null;
+            user.RefreshTokenExpiryTime = null;
+
+            var result = await userManager.UpdateAsync(user);
+            return result.Succeeded;
+        }
+
         public async Task<UserResultDTO> RegisterAsync(RegisterDTO registerModel)
         {
             var user = new ApplicationUser

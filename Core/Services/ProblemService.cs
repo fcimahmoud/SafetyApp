@@ -1,5 +1,6 @@
 ﻿
 global using Shared.ProblemModels;
+using Domain.Entities;
 
 namespace Services
 {
@@ -39,6 +40,17 @@ namespace Services
             if (problem == null)
                 throw new Exception("Problem not found");
 
+            var user = await _unitOfWork.GetRepository<Client, string>()
+                .GetWithIncludesAsync(c => c.Id == problem.ClientId, c => c.ApplicationUser!);
+            var clientName = user?.ApplicationUser != null ?
+                        $"{user.ApplicationUser.FirstName} {user.ApplicationUser.LastName}" : "Unknown";
+
+
+            var tech = await _unitOfWork.GetRepository<Technician, string>()
+                .GetWithIncludesAsync(t => t.Id == problem.TechnicianId, t => t.ApplicationUser!);
+            var techName = tech?.ApplicationUser != null ?
+                        $"{tech.ApplicationUser.FirstName} {tech.ApplicationUser.LastName}" : "Unassigned";
+
             return new ProblemDto
             {
                 Id = problem.Id,
@@ -46,14 +58,17 @@ namespace Services
                 Description = problem.Description,
                 Status = problem.Status,
                 ClientId = problem.ClientId,
+                ClientName = clientName,
                 TechnicianId = problem.TechnicianId,
+                TechnicianName = techName,
                 Type = problem.Type
             };
         }
         public async Task<IEnumerable<ProblemDto>> GetProblemsAsync()
         {
             var problemRepo = _unitOfWork.GetRepository<Problem, string>();
-            var problems = await problemRepo.GetAllAsync();
+            var problems = await problemRepo.GetAllWithIncludesAsync
+                (p => true, p => p.Client!.ApplicationUser!, p => p.Technician!.ApplicationUser!);
 
             return problems
                 .Select(p => new ProblemDto
@@ -63,14 +78,19 @@ namespace Services
                     Description = p.Description,
                     Status = p.Status,
                     ClientId = p.ClientId,
+                    ClientName = p.Client?.ApplicationUser != null ?
+                        $"{p.Client.ApplicationUser.FirstName} {p.Client.ApplicationUser.LastName}" : "Unknown",
                     TechnicianId = p.TechnicianId,
+                    TechnicianName = p.Technician?.ApplicationUser != null ?
+                        $"{p.Technician.ApplicationUser.FirstName} {p.Technician.ApplicationUser.LastName}" : "Unassigned",
                     Type = p.Type
                 });
         }
         public async Task<IEnumerable<ProblemDto>> GetProblemsByStatusAsync(ProblemStatus status)
         {
             var problemRepo = _unitOfWork.GetRepository<Problem, string>();
-            var problems = await problemRepo.GetAllAsync();
+            var problems = await problemRepo.GetAllWithIncludesAsync
+                (p => true, p => p.Client!.ApplicationUser!, p => p.Technician!.ApplicationUser!);
 
             return problems
                 .Where(p => p.Status == status)
@@ -81,7 +101,11 @@ namespace Services
                     Description = p.Description,
                     Status = p.Status,
                     ClientId = p.ClientId,
+                    ClientName = p.Client?.ApplicationUser != null ?
+                        $"{p.Client.ApplicationUser.FirstName} {p.Client.ApplicationUser.LastName}" : "Unknown",
                     TechnicianId = p.TechnicianId,
+                    TechnicianName = p.Technician?.ApplicationUser != null ?
+                        $"{p.Technician.ApplicationUser.FirstName} {p.Technician.ApplicationUser.LastName}" : "Unassigned",
                     Type = p.Type
                 });
         }
@@ -93,7 +117,8 @@ namespace Services
                 throw new Exception("Techician not found in tech table");
 
             var problemRepo = _unitOfWork.GetRepository<Problem, string>();
-            var problems = await problemRepo.GetAllAsync();
+            var problems = await problemRepo.GetAllWithIncludesAsync
+                (p => true, p => p.Client!.ApplicationUser!, p => p.Technician!.ApplicationUser!);
 
             return problems
                 .Where(p => p.TechnicianId == technician.Id)
@@ -104,7 +129,11 @@ namespace Services
                     Description = p.Description,
                     Status = p.Status,
                     ClientId = p.ClientId,
+                    ClientName = p.Client?.ApplicationUser != null ?
+                        $"{p.Client.ApplicationUser.FirstName} {p.Client.ApplicationUser.LastName}" : "Unknown",
                     TechnicianId = p.TechnicianId,
+                    TechnicianName = p.Technician?.ApplicationUser != null ?
+                        $"{p.Technician.ApplicationUser.FirstName} {p.Technician.ApplicationUser.LastName}" : "Unassigned",
                     Type = p.Type
                 });
         }
@@ -115,9 +144,11 @@ namespace Services
                 throw new Exception("Client not found in Client table");
 
             var problemRepo = _unitOfWork.GetRepository<Problem, string>();
-            var problems = await problemRepo.GetAllByConditionAsync(p => p.ClientId == client.Id);
+            var problems = await problemRepo.GetAllWithIncludesAsync
+                (p => true, p => p.Client!.ApplicationUser!, p => p.Technician!.ApplicationUser!);
 
             return problems
+                .Where(p => p.ClientId == client.Id)
                 .Select(p => new ProblemDto
                 {
                     Id = p.Id,
@@ -125,7 +156,11 @@ namespace Services
                     Description = p.Description,
                     Status = p.Status,
                     ClientId = p.ClientId,
+                    ClientName = p.Client?.ApplicationUser != null ?
+                        $"{p.Client.ApplicationUser.FirstName} {p.Client.ApplicationUser.LastName}" : "Unknown",
                     TechnicianId = p.TechnicianId,
+                    TechnicianName = p.Technician?.ApplicationUser != null ?
+                        $"{p.Technician.ApplicationUser.FirstName} {p.Technician.ApplicationUser.LastName}" : "Unassigned",
                     Type = p.Type
                 });
         }

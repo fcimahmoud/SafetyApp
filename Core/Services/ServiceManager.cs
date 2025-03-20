@@ -12,7 +12,7 @@ namespace Services
         ) : IServiceManager
     {
         private readonly Lazy<IAuthenticationService> _lazyAuthenticationService =
-            new(() => new AuthenticationService(userManager, unitOfWork, options, emailService));
+            new(() => new AuthenticationService(userManager, unitOfWork, options, emailService, httpContextAccessor));
         private readonly Lazy<IEmailService> _lazyEmailService =
             new(() => new EmailService(emailSettings));
         private readonly Lazy<IProblemService> _lazyProblemService =

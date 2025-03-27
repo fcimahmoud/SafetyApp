@@ -79,23 +79,19 @@ namespace Services
             await individualRepo.AddAsync(new Client { Id = Guid.NewGuid().ToString(), ApplicationUserId = user.Id });
             await unitOfWork.SaveChangesAsync();
 
-            // Generate refresh token and store it in the database
-            user.RefreshToken = GenerateRefreshToken();
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            // Generate OTP (6-digit code)
+            var otp = new Random().Next(100000, 999999).ToString();
+            user.EmailConfirmationOTP = otp;
+            user.OTPExpiryTime = DateTime.UtcNow.AddMinutes(10); // OTP expires in 10 minutes
             await userManager.UpdateAsync(user);
 
-            // Generate email confirmation token
-            var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-            var encodedToken = WebUtility.UrlEncode(token); // Ensure URL safe token
-            var confirmationLink = $"https://safety.com/verify-email?email={user.Email}&token={encodedToken}";
-
+            // Send OTP via email
             var emailBody = $@"
-            <h2>Confirm Your Email</h2>
-            <p>Click the link below to confirm your email:</p>
-            <a href='{confirmationLink}'>Confirm Email</a>
-            <p>If you didn't request this, ignore this email.</p>";
+                            <h2>Email Verification</h2>
+                            <p>Your OTP code for email verification is: <strong>{otp}</strong></p>
+                            <p>This OTP will expire in 10 minutes.</p>";
 
-            await emailService.SendEmailAsync(user.Email, "Confirm Your Email", emailBody);
+            await emailService.SendEmailAsync(user.Email, "Verify Your Email", emailBody);
 
             return new UserResultDTO(
              user.FirstName,
@@ -126,13 +122,21 @@ namespace Services
                 newRefreshToken);
         }
 
-        public async Task<bool> ConfirmEmailAsync(string email, string token)
+        public async Task<bool> ConfirmEmailAsync(string email, string otp)
         {
             var user = await userManager.FindByEmailAsync(email);
             if (user == null) return false;
 
-            var result = await userManager.ConfirmEmailAsync(user, token);
-            return result.Succeeded;
+            if (user.EmailConfirmationOTP != otp || user.OTPExpiryTime <= DateTime.UtcNow)
+                throw new ValidationException(new List<string> { "Invalid or expired OTP." });
+
+            // Confirm email
+            user.EmailConfirmed = true;
+            user.EmailConfirmationOTP = null; // Clear OTP after verification
+            user.OTPExpiryTime = null;
+            await userManager.UpdateAsync(user);
+
+            return true;
         }
         private async Task<string> CreateAccessTokenAsync(ApplicationUser user)
         {

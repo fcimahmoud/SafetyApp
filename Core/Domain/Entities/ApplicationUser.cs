@@ -9,6 +9,9 @@ namespace Domain.Entities
         public required string LastName { get; set; }
         public required string UserType { get; set; }
 
+        public string? EmailConfirmationOTP { get; set; }
+        public DateTime? OTPExpiryTime { get; set; }
+
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiryTime { get; set; }
 

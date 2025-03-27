@@ -34,10 +34,10 @@ namespace Presentation
             => Ok(await serviceManager.AuthenticationService.RegisterAsync(register));
 
         [HttpPost("Confirm-Email")]
-        public async Task<IActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string token)
+        public async Task<IActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string otp)
         {
-            var result = await serviceManager.AuthenticationService.ConfirmEmailAsync(email, token);
-            if (!result) return BadRequest("Email confirmation failed. Invalid or expired token.");
+            var result = await serviceManager.AuthenticationService.ConfirmEmailAsync(email, otp);
+            if (!result) return BadRequest("Email confirmation failed. Invalid or expired OTP.");
 
             return Ok("Email confirmed successfully. You can now log in.");
         }
@@ -59,7 +59,7 @@ namespace Presentation
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto dto)
         {
             var result = await serviceManager.AuthenticationService.ResetPasswordAsync(dto);
-            if (!result) return BadRequest("Invalid token or password reset failed.");
+            if (!result) return BadRequest("Invalid OTP or password reset failed.");
 
             return Ok("Password reset successfully.");
         }

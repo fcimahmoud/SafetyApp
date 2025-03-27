@@ -5,8 +5,7 @@ namespace Services
         UserManager<ApplicationUser> userManager,
         IUnitOfWork unitOfWork,
         IOptions<JwtOptions> options,
-        IEmailService emailService,
-        IHttpContextAccessor httpContextAccessor
+        IEmailService emailService
         )
         : IAuthenticationService
     {
@@ -183,31 +182,48 @@ namespace Services
             var user = await userManager.FindByEmailAsync(dto.Email);
             if (user == null) return false;  // Email doesn't exist
 
-            var token = await userManager.GeneratePasswordResetTokenAsync(user);
-            var resetUrl = $"https://safety.com/reset-password?email={dto.Email}&token={token}";
-            // var resetUrl = $"{_config["AppSettings:FrontendUrl"]}/Reset-Password?email={email}&token={token}";
+            // Generate a 6-digit OTP
+            var otp = new Random().Next(100000, 999999).ToString();
 
+            // Store OTP and expiration in database
+            user.PasswordResetOTP = otp;
+            user.PasswordResetOTPExpiry = DateTime.UtcNow.AddMinutes(10); // OTP valid for 10 minutes
+            await userManager.UpdateAsync(user);
 
+            // Send OTP via email
             var emailBody = $@"
-            <h2>Password Reset Request</h2>
-            <p>Click the link below to reset your password:</p>
-            <a href='{resetUrl}'>Reset Password</a>
-            <p>If you didn't request this, ignore this email.</p>";
+                            <h2>Password Reset OTP</h2>
+                            <p>Use the following OTP to reset your password:</p>
+                            <h3>{otp}</h3>
+                            <p>This OTP will expire in 10 minutes.</p>
+                            <p>If you didn't request this, ignore this email.</p>";
 
-            return await emailService.SendEmailAsync(dto.Email, "Reset Your Password", emailBody);
+            return await emailService.SendEmailAsync(user.Email, "Password Reset OTP", emailBody);
         }
         public async Task<bool> ResetPasswordAsync(ResetPasswordRequestDto dto)
         {
             var user = await userManager.FindByEmailAsync(dto.Email);
             if (user == null) return false;  // Email doesn't exist
 
-            // Validate new password strength
-            var passwordValidator = new PasswordValidator<ApplicationUser>();
-            var result = await passwordValidator.ValidateAsync(userManager, user, dto.NewPassword);
-            if (!result.Succeeded) return false;  // Password is not strong enough
+            // Check if OTP is valid
+            if (user.PasswordResetOTP != dto.OTP || user.PasswordResetOTPExpiry < DateTime.UtcNow)
+            {
+                throw new ValidationException(new List<string> { "Invalid or expired OTP." });
+            }
 
-            var resetResult = await userManager.ResetPasswordAsync(user, dto.Token, dto.NewPassword);
-            return resetResult.Succeeded;
+            // Reset Password
+            var resetResult = await userManager.RemovePasswordAsync(user);
+            if (!resetResult.Succeeded) return false;
+
+            resetResult = await userManager.AddPasswordAsync(user, dto.NewPassword);
+            if (!resetResult.Succeeded) return false;
+
+            // Clear OTP after successful reset
+            user.PasswordResetOTP = null;
+            user.PasswordResetOTPExpiry = null;
+            await userManager.UpdateAsync(user);
+
+            return true;
         }
     }
 }

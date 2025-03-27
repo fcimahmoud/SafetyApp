@@ -9,8 +9,13 @@ namespace Domain.Entities
         public required string LastName { get; set; }
         public required string UserType { get; set; }
 
+        // Add these fields for OTP verification
         public string? EmailConfirmationOTP { get; set; }
         public DateTime? OTPExpiryTime { get; set; }
+
+        // Add OTP fields for password reset
+        public string? PasswordResetOTP { get; set; }
+        public DateTime? PasswordResetOTPExpiry { get; set; }
 
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiryTime { get; set; }

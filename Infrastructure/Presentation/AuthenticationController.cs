@@ -63,5 +63,20 @@ namespace Presentation
 
             return Ok("Password reset successfully.");
         }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetProfile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized(new
+            {
+                StatusCode = 401,
+                ErrorMessage = "User not authenticated."
+            });
+
+            var user = await serviceManager.UserService.GetUserProfileAsync(userId);
+            return Ok(user);
+        }
     }
 }

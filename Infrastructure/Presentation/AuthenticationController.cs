@@ -64,6 +64,23 @@ namespace Presentation
             return Ok("Password reset successfully.");
         }
 
+        [HttpPost("Resend-EmailConfirmation-Otp")]
+        public async Task<IActionResult> ResendEmailConfirmationOTP([FromBody] ResendOTPRequestDto request)
+        {
+            var success = await serviceManager.AuthenticationService.ResendEmailConfirmationOTPAsync(request.Email);
+            if (!success) return BadRequest("Failed to resend OTP.");
+
+            return Ok(new { Message = "OTP resent successfully. Please check your email." });
+        }
+        [HttpPost("Resend-PasswordReset-Otp")]
+        public async Task<IActionResult> ResendPasswordResetOTP([FromBody] ResendOTPRequestDto request)
+        {
+            var success = await serviceManager.AuthenticationService.ResendPasswordResetOTPAsync(request.Email);
+            if (!success) return BadRequest("Failed to resend OTP.");
+
+            return Ok(new { Message = "OTP resent successfully. Please check your email." });
+        }
+
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetProfile()

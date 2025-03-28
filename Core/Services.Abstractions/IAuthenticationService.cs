@@ -13,5 +13,8 @@ namespace Services.Abstractions
 
         public Task<bool> ForgotPasswordAsync(ForgotPasswordRequestDto model);
         public Task<bool> ResetPasswordAsync(ResetPasswordRequestDto model);
+
+        public Task<bool> ResendEmailConfirmationOTPAsync(string email);
+        public Task<bool> ResendPasswordResetOTPAsync(string email);
     }
 }

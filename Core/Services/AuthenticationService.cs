@@ -225,5 +225,54 @@ namespace Services
 
             return true;
         }
+
+
+        public async Task<bool> ResendEmailConfirmationOTPAsync(string email)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if (user == null) throw new NotFoundException("User not found.");
+
+            // Generate a new 6-digit OTP
+            var otp = new Random().Next(100000, 999999).ToString();
+
+            // Update OTP in the database
+            user.EmailConfirmationOTP = otp;
+            user.OTPExpiryTime = DateTime.UtcNow.AddMinutes(10); // OTP valid for 10 minutes
+            await userManager.UpdateAsync(user);
+
+            // Send the new OTP via email
+            var emailBody = $@"
+                            <h2>Resend OTP Request</h2>
+                            <p>Your new OTP for email confirmation is:</p>
+                            <h3>{otp}</h3>
+                            <p>This OTP will expire in 10 minutes.</p>
+                            <p>If you didn't request this, please ignore this email.</p>";
+
+            return await emailService.SendEmailAsync(user.Email, "Resend OTP", emailBody);
+        }
+        public async Task<bool> ResendPasswordResetOTPAsync(string email)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if (user == null) throw new NotFoundException("User not found.");
+
+            // Generate a new 6-digit OTP
+            var otp = new Random().Next(100000, 999999).ToString();
+
+            // Update OTP in the database
+            user.PasswordResetOTP = otp;
+            user.PasswordResetOTPExpiry = DateTime.UtcNow.AddMinutes(10); // OTP valid for 10 minutes
+            await userManager.UpdateAsync(user);
+
+            // Send the new OTP via email
+            var emailBody = $@"
+                            <h2>Resend OTP Request</h2>
+                            <p>Your new OTP to reset your password is:</p>
+                            <h3>{otp}</h3>
+                            <p>This OTP will expire in 10 minutes.</p>
+                            <p>If you didn't request this, please ignore this email.</p>";
+
+            return await emailService.SendEmailAsync(user.Email, "Resend OTP", emailBody);
+        }
+
     }
 }

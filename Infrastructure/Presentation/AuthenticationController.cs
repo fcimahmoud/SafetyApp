@@ -52,7 +52,7 @@ namespace Presentation
             var result = await serviceManager.AuthenticationService.ForgotPasswordAsync(dto);
             if (!result) return BadRequest("Email not found or failed to send email.");
 
-            return Ok("Password reset link sent successfully.");
+            return Ok("Password reset OTP sent successfully.");
         }
 
         [HttpPut("Reset-Password")]

@@ -13,6 +13,7 @@ namespace Shared.ProblemModels
         public string? ClientName { get; set; }
         public string? TechnicianId { get; set; }
         public string? TechnicianName { get; set; }
-        public ProblemType Type { get; set; }
+        public string? ProblemTypeId { get; set; }
+        public string? ProblemTypeName { get; set; }
     }
 }

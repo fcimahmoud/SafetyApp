@@ -7,5 +7,6 @@ namespace Services.Abstractions
         public IEmailService EmailService { get; }
         public IProblemService ProblemService { get; }
         public IUserService UserService { get; }
+        public IProblemTypeService ProblemTypeService { get; }
     }
 }

@@ -19,6 +19,8 @@ namespace Services
             new(() => new ProblemService(unitOfWork, fileService, httpContextAccessor));
         private readonly Lazy<IUserService> _lazyUserService =
             new(() => new UserService(userManager, unitOfWork));
+        private readonly Lazy<IProblemTypeService> _lazyProblemTypeService =
+            new(() => new ProblemTypeService(unitOfWork));
 
         public IAuthenticationService AuthenticationService => _lazyAuthenticationService.Value;
         public IEmailService EmailService => _lazyEmailService.Value;
@@ -26,5 +28,7 @@ namespace Services
         public IProblemService ProblemService => _lazyProblemService.Value;
 
         public IUserService UserService => _lazyUserService.Value;
+
+        public IProblemTypeService ProblemTypeService => _lazyProblemTypeService.Value;
     }
 }

@@ -6,7 +6,7 @@ namespace Persistence.Data.Configurations
     {
         public virtual void Configure(EntityTypeBuilder<TEntity> builder)
         {
-            builder.Property(B => B.Id).ValueGeneratedOnAdd();   // If Key (Id) is an Numeric Type It Will Use The Identity Column (1,1), If it isn't Will Generate a New Guid
+            builder.Property(B => B.Id).ValueGeneratedOnAdd();   // If Key (Id) is an Numeric ProblemType It Will Use The Identity Column (1,1), If it isn't Will Generate a New Guid
         }
     }
 }

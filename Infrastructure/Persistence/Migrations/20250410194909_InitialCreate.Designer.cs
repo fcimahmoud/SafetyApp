@@ -12,8 +12,8 @@ using Persistence.Data;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(SafetyDbContext))]
-    [Migration("20250315222918_AddImagePath")]
-    partial class AddImagePath
+    [Migration("20250410194909_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,6 +40,9 @@ namespace Persistence.Migrations
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("EmailConfirmationOTP")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
@@ -70,8 +73,17 @@ namespace Persistence.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<DateTime?>("OTPExpiryTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordResetOTP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PasswordResetOTPExpiry")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
@@ -163,22 +175,38 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ProblemTypeId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("TechnicianId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ClientId");
 
+                    b.HasIndex("ProblemTypeId");
+
                     b.HasIndex("TechnicianId");
 
                     b.ToTable("Problems");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ProblemType", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProblemTypes");
                 });
 
             modelBuilder.Entity("Domain.Entities.Technician", b =>
@@ -358,12 +386,19 @@ namespace Persistence.Migrations
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Domain.Entities.ProblemType", "ProblemType")
+                        .WithMany()
+                        .HasForeignKey("ProblemTypeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Domain.Entities.Technician", "Technician")
                         .WithMany()
                         .HasForeignKey("TechnicianId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Client");
+
+                    b.Navigation("ProblemType");
 
                     b.Navigation("Technician");
                 });

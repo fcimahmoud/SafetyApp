@@ -1,4 +1,4 @@
-﻿
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -33,6 +33,10 @@ namespace Persistence.Migrations
                     FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     UserType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EmailConfirmationOTP = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OTPExpiryTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    PasswordResetOTP = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PasswordResetOTPExpiry = table.Column<DateTime>(type: "datetime2", nullable: true),
                     RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RefreshTokenExpiryTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -53,6 +57,18 @@ namespace Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProblemTypes",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProblemTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -220,9 +236,10 @@ namespace Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    PictureUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
+                    ProblemTypeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     ClientId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     TechnicianId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
@@ -235,6 +252,12 @@ namespace Persistence.Migrations
                         principalTable: "Clients",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Problems_ProblemTypes_ProblemTypeId",
+                        column: x => x.ProblemTypeId,
+                        principalTable: "ProblemTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Problems_Technicians_TechnicianId",
                         column: x => x.TechnicianId,
@@ -302,6 +325,11 @@ namespace Persistence.Migrations
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Problems_ProblemTypeId",
+                table: "Problems",
+                column: "ProblemTypeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Problems_TechnicianId",
                 table: "Problems",
                 column: "TechnicianId");
@@ -343,6 +371,9 @@ namespace Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Clients");
+
+            migrationBuilder.DropTable(
+                name: "ProblemTypes");
 
             migrationBuilder.DropTable(
                 name: "Technicians");

@@ -22,6 +22,11 @@ namespace Persistence.Data.Configurations
                    .WithMany()
                    .HasForeignKey(t => t.TechnicianId)
                    .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(t => t.ProblemType)
+                    .WithMany()
+                    .HasForeignKey(t => t.ProblemTypeId)
+                    .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

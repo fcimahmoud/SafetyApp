@@ -172,22 +172,38 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ProblemTypeId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("TechnicianId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ClientId");
 
+                    b.HasIndex("ProblemTypeId");
+
                     b.HasIndex("TechnicianId");
 
                     b.ToTable("Problems");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ProblemType", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProblemTypes");
                 });
 
             modelBuilder.Entity("Domain.Entities.Technician", b =>
@@ -367,12 +383,19 @@ namespace Persistence.Migrations
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Domain.Entities.ProblemType", "ProblemType")
+                        .WithMany()
+                        .HasForeignKey("ProblemTypeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Domain.Entities.Technician", "Technician")
                         .WithMany()
                         .HasForeignKey("TechnicianId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Client");
+
+                    b.Navigation("ProblemType");
 
                     b.Navigation("Technician");
                 });

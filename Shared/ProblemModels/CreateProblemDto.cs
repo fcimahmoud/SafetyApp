@@ -7,6 +7,6 @@ namespace Shared.ProblemModels
     {
         public IFormFile Image { get; set; } = default!;
         public string Description { get; set; } = string.Empty;
-        public ProblemType Type { get; set; }
+        public string ProblemTypeId { get; set; }
     }
 }

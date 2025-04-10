@@ -23,7 +23,7 @@ namespace Services
                 Id = Guid.NewGuid().ToString(),
                 ImagePath = imagePath,
                 Description = dto.Description,
-                Type = dto.Type,
+                ProblemTypeId = dto.ProblemTypeId,
                 ClientId = client!.Id,
                 Status = ProblemStatus.Pending
             };
@@ -51,6 +51,9 @@ namespace Services
             var techName = tech?.ApplicationUser != null ?
                         $"{tech.ApplicationUser.FirstName} {tech.ApplicationUser.LastName}" : "Unassigned";
 
+            var type = await _unitOfWork.GetRepository<ProblemType, string>()
+                .GetAsync(problem.ProblemTypeId!);
+
             return new ProblemDto
             {
                 Id = problem.Id,
@@ -61,14 +64,15 @@ namespace Services
                 ClientName = clientName,
                 TechnicianId = problem.TechnicianId,
                 TechnicianName = techName,
-                Type = problem.Type
+                ProblemTypeId = problem.ProblemTypeId,
+                ProblemTypeName = type != null ? type.Name : "not found",
             };
         }
         public async Task<IEnumerable<ProblemDto>> GetProblemsAsync()
         {
             var problemRepo = _unitOfWork.GetRepository<Problem, string>();
             var problems = await problemRepo.GetAllWithIncludesAsync
-                (p => true, p => p.Client!.ApplicationUser!, p => p.Technician!.ApplicationUser!);
+                (p => true, p => p.Client!.ApplicationUser!, p => p.Technician!.ApplicationUser!, problemRepo => problemRepo.ProblemType!);
 
             return problems
                 .Select(p => new ProblemDto
@@ -83,14 +87,15 @@ namespace Services
                     TechnicianId = p.TechnicianId,
                     TechnicianName = p.Technician?.ApplicationUser != null ?
                         $"{p.Technician.ApplicationUser.FirstName} {p.Technician.ApplicationUser.LastName}" : "Unassigned",
-                    Type = p.Type
+                    ProblemTypeId = p.ProblemTypeId,
+                    ProblemTypeName = p.ProblemType != null ? p.ProblemType.Name : "not found",
                 });
         }
         public async Task<IEnumerable<ProblemDto>> GetProblemsByStatusAsync(ProblemStatus status)
         {
             var problemRepo = _unitOfWork.GetRepository<Problem, string>();
             var problems = await problemRepo.GetAllWithIncludesAsync
-                (p => true, p => p.Client!.ApplicationUser!, p => p.Technician!.ApplicationUser!);
+                (p => true, p => p.Client!.ApplicationUser!, p => p.Technician!.ApplicationUser!, p => p.ProblemType);
 
             return problems
                 .Where(p => p.Status == status)
@@ -106,7 +111,8 @@ namespace Services
                     TechnicianId = p.TechnicianId,
                     TechnicianName = p.Technician?.ApplicationUser != null ?
                         $"{p.Technician.ApplicationUser.FirstName} {p.Technician.ApplicationUser.LastName}" : "Unassigned",
-                    Type = p.Type
+                    ProblemTypeId = p.ProblemTypeId,
+                    ProblemTypeName = p.ProblemType != null ? p.ProblemType.Name : "not found",
                 });
         }
 
@@ -118,7 +124,7 @@ namespace Services
 
             var problemRepo = _unitOfWork.GetRepository<Problem, string>();
             var problems = await problemRepo.GetAllWithIncludesAsync
-                (p => true, p => p.Client!.ApplicationUser!, p => p.Technician!.ApplicationUser!);
+                (p => true, p => p.Client!.ApplicationUser!, p => p.Technician!.ApplicationUser!, p => p.ProblemType);
 
             return problems
                 .Where(p => p.TechnicianId == technician.Id)
@@ -134,7 +140,8 @@ namespace Services
                     TechnicianId = p.TechnicianId,
                     TechnicianName = p.Technician?.ApplicationUser != null ?
                         $"{p.Technician.ApplicationUser.FirstName} {p.Technician.ApplicationUser.LastName}" : "Unassigned",
-                    Type = p.Type
+                    ProblemTypeId = p.ProblemTypeId,
+                    ProblemTypeName = p.ProblemType != null ? p.ProblemType.Name : "not found",
                 });
         }
         public async Task<IEnumerable<ProblemDto>> GetProblemsByClientAsync(string clientId)
@@ -145,7 +152,7 @@ namespace Services
 
             var problemRepo = _unitOfWork.GetRepository<Problem, string>();
             var problems = await problemRepo.GetAllWithIncludesAsync
-                (p => true, p => p.Client!.ApplicationUser!, p => p.Technician!.ApplicationUser!);
+                (p => true, p => p.Client!.ApplicationUser!, p => p.Technician!.ApplicationUser!, p => p.ProblemType);
 
             return problems
                 .Where(p => p.ClientId == client.Id)
@@ -161,7 +168,8 @@ namespace Services
                     TechnicianId = p.TechnicianId,
                     TechnicianName = p.Technician?.ApplicationUser != null ?
                         $"{p.Technician.ApplicationUser.FirstName} {p.Technician.ApplicationUser.LastName}" : "Unassigned",
-                    Type = p.Type
+                    ProblemTypeId = p.ProblemTypeId,
+                    ProblemTypeName = p.ProblemType != null ? p.ProblemType.Name : "not found",
                 });
         }
         public async Task AssignProblemToTechnicianAsync(string problemId, string technicianId)
@@ -211,7 +219,7 @@ namespace Services
                 throw new Exception("Problem not found");
 
             problem.Description = dto.Description;
-            problem.Type = dto.Type;
+            problem.ProblemTypeId = dto.ProblemTypeId;
 
             problemRepo.Update(problem);
             await _unitOfWork.SaveChangesAsync();

@@ -20,6 +20,9 @@ namespace Domain.Entities
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiryTime { get; set; }
 
+        // Firebase Token
+        public string? FcmToken { get; set; }
+
         // Navigational Properties
         public Client? Client { get; set; }
         public Technician? Technician { get; set; }

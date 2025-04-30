@@ -16,5 +16,7 @@ namespace Services.Abstractions
 
         public Task<bool> ResendEmailConfirmationOTPAsync(string email);
         public Task<bool> ResendPasswordResetOTPAsync(string email);
+
+        public Task<bool> RegisterFcmTokenAsync(FcmTokenDto dto);
     }
 }

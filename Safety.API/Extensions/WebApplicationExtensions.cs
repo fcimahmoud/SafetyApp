@@ -21,6 +21,10 @@ namespace Safety.API.Extensions
 
             try
             {
+                // Apply migrations automatically
+                var context = services.GetRequiredService<SafetyDbContext>();
+                await context.Database.MigrateAsync();
+
                 // To Update Database for gFootContext
                 await safetyContextInitializer.InitializeIdentityAsync();
 

@@ -4,6 +4,7 @@ global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Http;
 global using Shared.ProblemModels;
 global using System.Security.Claims;
+using FirebaseAdmin.Messaging;
 
 namespace Presentation
 {
@@ -23,6 +24,10 @@ namespace Presentation
             });
 
             await serviceManager.ProblemService.AddProblemAsync(userId, dto);
+            await serviceManager.NotificationService.SendToEngineerAsync(
+                "مشكلة جديدة",
+                "تمت إضافة مشكلة جديدة. يُرجى مراجعة التطبيق لمزيد من التفاصيل.");
+
             return Ok("Problem added successfully");
         }
 
@@ -106,7 +111,7 @@ namespace Presentation
         }
 
         [HttpDelete("{problemId}")]
-        [Authorize(Roles = "ClientRole")]
+        [Authorize(Roles = "ClientRole,EngineerRole")]
         public async Task<IActionResult> DeleteProblem(string problemId)
         {
             await serviceManager.ProblemService.DeleteProblemAsync(problemId);
@@ -119,6 +124,12 @@ namespace Presentation
         public async Task<IActionResult> AssignProblemToTechnician(string problemId, string technicianId)
         {
             await serviceManager.ProblemService.AssignProblemToTechnicianAsync(problemId, technicianId);
+            await serviceManager.NotificationService.SendToTechnicianAsync(
+                technicianId,
+                "تعيين المشكلة",
+                $"لقد تم تعيين مشكلة لك من خلال الادمن. يُرجى مراجعة التطبيق لمزيد من التفاصيل."
+            );
+
             return Ok("Problem assigned successfully");
         }
 

@@ -1,4 +1,6 @@
 ﻿
+using Microsoft.Extensions.Configuration;
+
 namespace Services
 {
     public class ServiceManager(
@@ -21,6 +23,8 @@ namespace Services
             new(() => new UserService(userManager, unitOfWork));
         private readonly Lazy<IProblemTypeService> _lazyProblemTypeService =
             new(() => new ProblemTypeService(unitOfWork));
+        private readonly Lazy<INotificationService> _lazyNotificationService =
+            new(() => new NotificationService(unitOfWork, userManager));
 
         public IAuthenticationService AuthenticationService => _lazyAuthenticationService.Value;
         public IEmailService EmailService => _lazyEmailService.Value;
@@ -30,5 +34,7 @@ namespace Services
         public IUserService UserService => _lazyUserService.Value;
 
         public IProblemTypeService ProblemTypeService => _lazyProblemTypeService.Value;
+
+        public INotificationService NotificationService => _lazyNotificationService.Value;
     }
 }

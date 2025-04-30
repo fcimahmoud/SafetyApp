@@ -8,5 +8,6 @@ namespace Services.Abstractions
         public IProblemService ProblemService { get; }
         public IUserService UserService { get; }
         public IProblemTypeService ProblemTypeService { get; }
+        public INotificationService NotificationService { get; }
     }
 }

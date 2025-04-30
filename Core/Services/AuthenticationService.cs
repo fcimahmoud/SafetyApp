@@ -274,5 +274,15 @@ namespace Services
             return await emailService.SendEmailAsync(user.Email, "Resend OTP", emailBody);
         }
 
+        public async Task<bool> RegisterFcmTokenAsync(FcmTokenDto dto)
+        {
+            var user = await userManager.FindByIdAsync(dto.UserId);
+            if (user == null) return false;
+
+            user.FcmToken = dto.Token;
+            var result = await userManager.UpdateAsync(user);
+
+            return result.Succeeded;
+        }
     }
 }

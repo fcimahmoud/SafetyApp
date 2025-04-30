@@ -1,6 +1,7 @@
 ﻿
 global using Services.Abstractions;
 global using Shared.AuthenticationModels;
+using Microsoft.AspNetCore.Identity;
 
 namespace Presentation
 {
@@ -95,5 +96,12 @@ namespace Presentation
             var user = await serviceManager.UserService.GetUserProfileAsync(userId);
             return Ok(user);
         }
+
+
+        [HttpPost("register-token")]
+        public async Task<IActionResult> RegisterFcmToken([FromBody] FcmTokenDto dto)
+            => Ok(await serviceManager.AuthenticationService.RegisterFcmTokenAsync(dto));
+        
+
     }
 }

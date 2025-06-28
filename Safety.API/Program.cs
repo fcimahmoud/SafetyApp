@@ -49,7 +49,7 @@ namespace Safety.API
     {
         public FirebaseInitializer(IHostEnvironment env)
         {
-            var jsonPath = Path.Combine(env.ContentRootPath, "Secrets", "safety-first-eb105-firebase-adminsdk-fbsvc-10a72619ae.json");
+            var jsonPath = Path.Combine(env.ContentRootPath, "Secrets", "safety-first-eb105-firebase-adminsdk-fbsvc-99e5a3c18e.json");
 
             if (FirebaseApp.DefaultInstance == null)
             {

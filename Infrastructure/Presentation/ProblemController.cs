@@ -24,9 +24,11 @@ namespace Presentation
             });
 
             await serviceManager.ProblemService.AddProblemAsync(userId, dto);
-            await serviceManager.NotificationService.SendToEngineerAsync(
+
+/*            await serviceManager.NotificationService.SendToEngineerAsync(
                 "مشكلة جديدة",
-                "تمت إضافة مشكلة جديدة. يُرجى مراجعة التطبيق لمزيد من التفاصيل.");
+                "تمت إضافة مشكلة جديدة. يُرجى مراجعة التطبيق لمزيد من التفاصيل.");*/
+
 
             return Ok("Problem added successfully");
         }
@@ -124,11 +126,13 @@ namespace Presentation
         public async Task<IActionResult> AssignProblemToTechnician(string problemId, string technicianId)
         {
             await serviceManager.ProblemService.AssignProblemToTechnicianAsync(problemId, technicianId);
-            await serviceManager.NotificationService.SendToTechnicianAsync(
+
+/*            await serviceManager.NotificationService.SendToTechnicianAsync(
                 technicianId,
                 "تعيين المشكلة",
                 $"لقد تم تعيين مشكلة لك من خلال الادمن. يُرجى مراجعة التطبيق لمزيد من التفاصيل."
-            );
+            );*/
+
 
             return Ok("Problem assigned successfully");
         }
